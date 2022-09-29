@@ -88,7 +88,7 @@ terraform apply -auto-approve
 - `wordpress` - данная роль разворачивает готовый сайт и производит загрузку БД сайта в кластер MySQL.  
 
 Результат работы - стартовая страница сайта:  
-![wordpress.png](images/wordpress.png)
+![wordpress_1.png](images/wordpress_1.png)
 
 ---
 
@@ -104,27 +104,35 @@ terraform apply -auto-approve
 `Gitlab CE` устанавливается ролью `gitlab_install` на хост `gitlab.sysad.su`.  
 `Runner`  устанавливается ролью `runner_install` на хост `runner.sysad.su`, при этом производится автоматическая регистрация runner'а на `gitlab.sysad.su` для возможности использования shared runner.  
 
+![wp_gitlab_6.png](images/wp_gitlab_6.png)
+
+Добавляю ключ в переменную `ssh_key` в Variables:  
+
+![wp_gitlab_3.png](images/wp_gitlab_3.png)
+
 Через веб-интерфейс gitlab создаю новый проект `wp`:  
+
 ![wp_gitlab_1.png](images/wp_gitlab_1.png)
 
 Произвожу загрузку проекта с локального компьютера в проект gitlab:  
   ```
-  # git remote rename origin old-origin
-  # git remote add origin http://gitlab.sysad.su/gitlab-instance-eb861793/wp.git
-  # git push -u origin --all
+# git remote rename origin old-origin
+# git remote add origin http://gitlab.sysad.su/gitlab-instance-70d2e357/wp.git
+# git add .
+# git commit -m "Initial commit"
+# git push origin
 Username for 'https://gitlab.sysad.su': root
 Password for 'https://root@gitlab.sysad.su': 
-warning: переадресация на https://gitlab.sysad.su/gitlab-instance-eb861793/wp.git/
-Перечисление объектов: 3191, готово.
-Подсчет объектов: 100% (3191/3191), готово.
+warning: переадресация на https://gitlab.sysad.su/gitlab-instance-70d2e357/wp.git/
+Перечисление объектов: 3203, готово.
+Подсчет объектов: 100% (3203/3203), готово.
 При сжатии изменений используется до 8 потоков
-Сжатие объектов: 100% (3120/3120), готово.
-Запись объектов: 100% (3191/3191), 19.88 MiB | 5.14 MiB/s, готово.
-Всего 3191 (изменения 569), повторно использовано 0 (изменения 0)
-remote: Resolving deltas: 100% (569/569), done.
-To http://gitlab.sysad.su/gitlab-instance-eb861793/wp.git
+Сжатие объектов: 100% (3131/3131), готово.
+Запись объектов: 100% (3203/3203), 19.88 MiB | 5.42 MiB/s, готово.
+Всего 3203 (изменения 574), повторно использовано 0 (изменения 0)
+remote: Resolving deltas: 100% (574/574), done.
+To http://gitlab.sysad.su/gitlab-instance-70d2e357/wp.git
  * [new branch]      master -> master
-Ветка «master» отслеживает внешнюю ветку «master» из «origin».
 
 ```
 
@@ -133,9 +141,6 @@ To http://gitlab.sysad.su/gitlab-instance-eb861793/wp.git
 ![wp_gitlab_2.png](images/wp_gitlab_2.png)
 
 
-Добавляю ключ в переменную `ssh_key` в Variables:  
-
-![wp_gitlab_3.png](images/wp_gitlab_3.png)
 
 
 Файл `.gitlab-ci.yml` содержит следующий код:  
@@ -168,9 +173,21 @@ phpinfo();
 ?>
 ```
 И выгружаю проект в репозиторий `gitlab.sysad.su`.
+```
+# git commit -m "Add 777.php"
+[master 0b58bca] Add 777.php
+ 1 file changed, 3 insertions(+)
+ create mode 100644 777.php
+```
+
+![wp_gitlab_31.png](images/wp_gitlab_31.png)
+
+
 В результате отрабатывает pipeline, изменения загружаются на сервер `app.sysad.su`:  
 
-![wp_gitlab_4.png](images/wp_gitlab_4.png)
+![wp_gitlab_32.png](images/wp_gitlab_32.png)
+  
+![wp_gitlab_33.png](images/wp_gitlab_33.png)
 
 Проверяем наличие нового файла на сервере - https://w3.sysad.su/777.php:  
 
@@ -201,3 +218,5 @@ phpinfo();
 **Grafana** дашбоард, отображающий метрики из MySQL:  
 
 ![grafana_mysql_exporter.png](images/grafana_mysql_exporter.png)
+
+---
