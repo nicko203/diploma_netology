@@ -47,7 +47,7 @@ terraform apply -auto-approve
 Для установки Nginx и LetsEncrypt на узел-бастион создана ansible-роль `nginx`.  
 Данная роль выполняет следующие функции:  
 - устанавливает на хост `nginx`, `certbot` (LetsEncrypt);
-- создаёт виртуальные хосты для доменов проекта `w3.sysad.su`, `gitlab.sysad.su`, `grafana.sysad.su`, `prometheus.sysad.su`, `alertmanager.sysad.su`;
+- создаёт в `nginx` конфиг-файлы виртуальных хостов для доменов проекта `w3.sysad.su`, `gitlab.sysad.su`, `grafana.sysad.su`, `prometheus.sysad.su`, `alertmanager.sysad.su`;
 - конфигурирует nginx в качестве реверс-прокси ( настраивает upstream для доменов проекта );
 - получает сертификаты LetsEncrypt для доменов проекта.
 
@@ -71,7 +71,7 @@ terraform apply -auto-approve
 - не требуется разделение на чтение и запись.
 
 Для развёртывания `Galera Claster` требуется минимум три хоста, для этого созданы хосты с именами `db01.sysad.su`, `db02.sysad.su`, `db03.sysad.su`.  
-Для установки и настройки кластера создана роль `mysql_galera_cluster_install`.
+Установка и настройка кластера выполняется ролью `mysql_galera_cluster_install`.
 
 В качестве балансировщика нагрузки используется `HAProxy`, устанавливается и настраивается для работы с кластером MySQL ролью `haproxy_install`.  
 
@@ -96,5 +96,5 @@ terraform apply -auto-approve
 
 Таким образом структурная схема веб-узла проекта выглядит следующим образом:  
  
-![web2.png](images/web2.png)
+![web3.png](images/web3.png)
 
