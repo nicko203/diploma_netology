@@ -222,4 +222,3 @@ phpinfo();
 ---
 
 Рабочие файла проекта находятся в каталоге https://github.com/nicko203/diploma_netology/tree/main/project
----
