@@ -98,3 +98,106 @@ terraform apply -auto-approve
  
 ![web3.png](images/web3.png)
 
+
+## 6. Установка Gitlab CE и Gitlab Runner.
+
+`Gitlab CE` устанавливается ролью `gitlab_install` на хост `gitlab.sysad.su`.  
+`Runner`  устанавливается ролью `runner_install` на хост `runner.sysad.su`, при этом производится автоматическая регистрация runner'а на `gitlab.sysad.su` для возможности использования shared runner.  
+
+Через веб-интерфейс gitlab создаю новый проект `wp`:  
+![wp_gitlab_1.png](images/wp_gitlab_1.png)
+
+Произвожу загрузку проекта с локального компьютера в проект gitlab:  
+  ```
+  # git remote rename origin old-origin
+  # git remote add origin http://gitlab.sysad.su/gitlab-instance-eb861793/wp.git
+  # git push -u origin --all
+Username for 'https://gitlab.sysad.su': root
+Password for 'https://root@gitlab.sysad.su': 
+warning: переадресация на https://gitlab.sysad.su/gitlab-instance-eb861793/wp.git/
+Перечисление объектов: 3191, готово.
+Подсчет объектов: 100% (3191/3191), готово.
+При сжатии изменений используется до 8 потоков
+Сжатие объектов: 100% (3120/3120), готово.
+Запись объектов: 100% (3191/3191), 19.88 MiB | 5.14 MiB/s, готово.
+Всего 3191 (изменения 569), повторно использовано 0 (изменения 0)
+remote: Resolving deltas: 100% (569/569), done.
+To http://gitlab.sysad.su/gitlab-instance-eb861793/wp.git
+ * [new branch]      master -> master
+Ветка «master» отслеживает внешнюю ветку «master» из «origin».
+
+```
+
+Результат загрузки проекта:  
+
+![wp_gitlab_2.png](images/wp_gitlab_2.png)
+
+
+Добавляю ключ в переменную `ssh_key` в Variables:  
+
+![wp_gitlab_3.png](images/wp_gitlab_3.png)
+
+
+Файл `.gitlab-ci.yml` содержит следующий код:  
+
+```
+---
+before_script:
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - echo "$ssh_key" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+
+stages:
+  - deploy
+
+deploy-job:
+  stage: deploy
+  script:
+    - echo "Deploying application..."
+    - ssh -o StrictHostKeyChecking=no ubuntu@app.sysad.su sudo chown -R ubuntu /var/www/w3.sysad.su/
+    - rsync -rvz --exclude '.git' --exclude '.gitlab-ci.yml' -e "ssh -o StrictHostKeyChecking=no" ./* ubuntu@app.sysad.su:/var/www/w3.sysad.su/
+    - ssh -o StrictHostKeyChecking=no ubuntu@app.sysad.su sudo chown -R www-data /var/www/w3.sysad.su/
+```
+
+В локальном проекте добавляю файл `777.php` с содержимым:  
+```
+<?php
+phpinfo();
+?>
+```
+И выгружаю проект в репозиторий `gitlab.sysad.su`.
+В результате отрабатывает pipeline, изменения загружаются на сервер `app.sysad.su`:  
+
+![wp_gitlab_4.png](images/wp_gitlab_4.png)
+
+Проверяем наличие нового файла на сервере - https://w3.sysad.su/777.php:  
+
+![wp_gitlab_5.png](images/wp_gitlab_5.png)
+
+Таким образом CI/CD настроен и успешно отрабатывает.  
+
+## 7. Установка Prometheus, Alert Manager, Node Exporter и Grafana.
+
+На все хосты проекта с помощью роли `node_exporter_install` устанавливается сервис `Node Exporter`.
+На хосты, предназначенные для работы MySQL, ролью `mysqld_exporter_install` устанавливается сервис `Mysql Exporter`.
+
+На хост `monitoring.sysad.su` устанавливаются службы `Prometheus`, `Alert Manager` и `Grafana`,  
+используемые роли `prometheus_install`, `alertmanager_install`, `grafana_install` соответственно.  
+
+**Prometheus:**  
+![prometheus.png](images/prometheus.png)
+
+
+**Alert Manager:**  
+![alertmanager.png](images/alertmanager.png)
+
+
+**Grafana** дашбоард, отображающий метрики из Node Exporter по всем серверам:  
+
+![grafana_node_exporter_1.png](images/grafana_node_exporter_1.png)
+
+**Grafana** дашбоард, отображающий метрики из MySQL:  
+
+![grafana_mysql_exporter.png](images/grafana_mysql_exporter.png.png)
