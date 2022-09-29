@@ -1,0 +1,7 @@
+---
+# tasks file for pubkey_distribution
+- name: Set authorized key taken from file
+  ansible.posix.authorized_key:
+    user: ubuntu
+    state: present
+    key: "{{ lookup('file', 'files/id_rsa.pub') }}"

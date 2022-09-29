@@ -1,0 +1,7 @@
+---
+# handlers file for node_exporter_install
+- name: "Start node_exporter.service"
+  systemd:
+    name: "node_exporter.service"
+    state: "started"
+    enabled: "true"

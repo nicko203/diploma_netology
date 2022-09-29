@@ -1,0 +1,42 @@
+---
+# tasks file for wordpress
+- name: Install MySQL client
+  apt:
+    name: ['mysql-client-5.7','mysql-client-core-5.7', 'python-pymysql', 'python3-pymysql', 'python-apt', 'python3-apt']
+    state: present
+
+- name: Copy archive to node_app
+  copy:
+    src: "{{item.value.archive}}"
+    dest: /var/www/{{item.key}}/{{item.value.archive}}
+    owner: root
+    group: root
+    mode: '0644'
+  with_dict: "{{ wp_sites }}"
+
+- name: Extract archive
+  command: "tar zxf /var/www/{{item.key}}/{{item.value.archive}} -C /var/www/{{item.key}}/"
+  with_dict: "{{ wp_sites }}"
+
+- name: Restore database
+  mysql_db:
+    login_user: wordpress
+    login_password: wordpress
+    login_host: 192.168.10.30
+    name: wordpress
+    state: import
+    target: /var/www/w3.sysad.su/_wordpress.sql
+
+- name: Delete dump
+  file:
+    path: /var/www/{{item.key}}/{{item.value.dump}}
+    state: absent
+  with_dict: "{{ wp_sites }}"
+
+- name: Delete archive
+  file:
+    path: /var/www/{{item.key}}/{{item.value.archive}}
+    state: absent
+  with_dict: "{{ wp_sites }}"
+
+

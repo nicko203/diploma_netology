@@ -1,0 +1,55 @@
+[nginx]
+proxy.sysad.su
+[nginx:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[app]
+app.sysad.su
+[app:vars]
+ansible_ssh_common_args='-l ubuntu -p 2220 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[gitlab]
+gitlab.sysad.su
+[gitlab:vars]
+ansible_ssh_common_args='-l ubuntu -p 2221 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[runner]
+runner.sysad.su
+[runner:vars]
+ansible_ssh_common_args='-l ubuntu -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[haproxy]
+proxy-sql.sysad.su
+[haproxy:vars]
+ansible_ssh_common_args='-l ubuntu -p 2230 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[db01]
+db01.sysad.su
+[db01:vars]
+ansible_ssh_common_args='-l ubuntu -p 2231 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+mysql_galera_node_address = 192.168.10.31
+mysql_galera_server_id = 1
+
+[db02]
+db02.sysad.su
+[db02:vars]
+ansible_ssh_common_args='-l ubuntu -p 2232 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+mysql_galera_node_address = 192.168.10.32
+mysql_galera_server_id = 2
+
+[db03]
+db03.sysad.su
+[db03:vars]
+ansible_ssh_common_args='-l ubuntu -p 2233 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+mysql_galera_node_address = 192.168.10.33
+mysql_galera_server_id = 3
+
+[dbs:children]
+db01
+db02
+db03
+
+[monitoring]
+prometheus.sysad.su
+[monitoring:vars]
+ansible_ssh_common_args='-l ubuntu -p 2225 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'

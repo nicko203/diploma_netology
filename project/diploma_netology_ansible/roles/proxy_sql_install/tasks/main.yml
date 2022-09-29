@@ -1,0 +1,31 @@
+---
+# tasks file for proxy_sql_install
+- name: Disable ufw
+  ufw:
+    state: disabled
+    policy: allow
+
+- name: Download ProxySQL
+#  command: "wget -o /dev/null https://github.com/sysown/proxysql/releases/download/v2.4.3/proxysql_2.4.3-dbg-ubuntu18_amd64.deb"
+  get_url:
+    url: https://github.com/sysown/proxysql/releases/download/v2.4.3/proxysql_2.4.3-dbg-ubuntu18_amd64.deb
+    dest: /home/ubuntu/proxysql_2.4.3-dbg-ubuntu18_amd64.deb
+
+- name: Install ProxySQL
+  command: "dpkg -i proxysql_2.4.3-dbg-ubuntu18_amd64.deb"
+
+- name: Stop ProxySQL
+  systemd:
+    name: proxysql
+    state: stopped
+
+- name: Enable ProxySQL
+  systemd:
+    name: proxysql
+    enabled: true
+
+- name: Start ProxySQL
+  systemd:
+    name: proxysql
+    state: started
+

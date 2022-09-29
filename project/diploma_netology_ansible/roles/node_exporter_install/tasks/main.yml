@@ -1,0 +1,47 @@
+---
+# tasks file for node_exporter_install
+- name: Create group nodeusr
+  ansible.builtin.group:
+    name: nodeusr
+    state: present
+
+- name: Create user nodeusr
+  ansible.builtin.user:
+    name: nodeusr
+    state: present
+    group: nodeusr
+    create_home: false
+    shell: "/usr/bin/false"
+
+- name: Get latest node_exporter
+  get_url:
+    url: https://github.com/prometheus/node_exporter/releases/download/v1.4.0-rc.0/node_exporter-1.4.0-rc.0.linux-amd64.tar.gz
+    dest: /usr/local/src/node_exporter.tar.gz
+
+- name: Extract archive
+  command: "tar zxf /usr/local/src/node_exporter.tar.gz -C /usr/local/src/"
+
+- name: Rename result dir to prometheus
+  ansible.builtin.shell:
+    cmd: bash -c "mv /usr/local/src/node_exporter-* /usr/local/src/node_exporter"
+  changed_when: false
+
+- name: Copy bin-file to /usr/local/bin
+  ansible.builtin.copy:
+    src: "/usr/local/src/node_exporter/{{ item }}"
+    dest: "/usr/local/bin/"
+    remote_src: true
+    owner: "nodeusr"
+    group: "nodeusr"
+    mode: "0755"
+  with_items:
+    - "node_exporter"
+
+- name: Create node_exporter.service
+  copy:
+    src: node_exporter.service
+    dest: /lib/systemd/system/node_exporter.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Start node_exporter.service

@@ -1,0 +1,13 @@
+---
+# defaults file for wordpress
+wp_sites:
+  w3.sysad.su:
+    domains:
+      - w3.sysad.su
+    site_path: "/var/www/"
+    archive: "w3.sysad.su.tgz"
+    dump: "_wordpress.sql"
+    mysql_host: "192.168.10.30"
+    mysql_db: "wordpress"
+    mysql_user: "wordpress"
+    mysql_passwd: "wordpress"

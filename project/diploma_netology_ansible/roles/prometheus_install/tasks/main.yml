@@ -1,0 +1,98 @@
+---
+# tasks file for prometheus_install
+- ufw:
+    state: disabled
+    policy: allow
+
+- name: Create group prometheus
+  ansible.builtin.group:
+    name: "prometheus"
+    state: "present"
+
+- name: Create user prometheus
+  ansible.builtin.user:
+    name: "prometheus"
+    state: "present"
+    group: "prometheus"
+    create_home: false
+    shell: "/usr/bin/false"
+
+- name: Create dir
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: "directory"
+    owner: "prometheus"
+    group: "prometheus"
+    mode: "0755"
+  with_items:
+    - "/etc/prometheus"
+    - "/var/lib/prometheus"
+
+- name: Get latest prometheus
+  get_url:
+    url: https://github.com/prometheus/prometheus/releases/download/v2.38.0/prometheus-2.38.0.linux-amd64.tar.gz
+    dest: /usr/local/src/prometheus.tar.gz
+
+- name: Extract archive
+  command: "tar zxf /usr/local/src/prometheus.tar.gz -C /usr/local/src/"
+
+- name: Delete archive
+  file:
+    path: /usr/local/src/prometheus.tar.gz
+    state: absent
+
+- name: Rename result dir to prometheus
+  ansible.builtin.shell:
+    cmd: bash -c "mv /usr/local/src/prometheus-* /usr/local/src/prometheus"
+  changed_when: false
+
+- name: Copy bin-file to /usr/local/bin
+  ansible.builtin.copy:
+    src: "/usr/local/src/prometheus/{{ item }}"
+    dest: "/usr/local/bin/"
+    remote_src: true
+    owner: "prometheus"
+    group: "prometheus"
+    mode: "0755"
+  with_items:
+    - "prometheus"
+    - "promtool"
+
+- name: Copy subcatalogs to /etc/prometheus
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/prometheus/"
+    remote_src: true
+    mode: "0755"
+    owner: "prometheus"
+    group: "prometheus"
+  with_items:
+    - "/usr/local/src/prometheus/console_libraries"
+    - "/usr/local/src/prometheus/consoles"
+
+#- name: Copy config to /etc/prometheus
+#  ansible.builtin.copy:
+#    src: "/usr/local/src/prometheus/prometheus.yml"
+#    dest: "/etc/prometheus/"
+#    remote_src: true
+#    mode: "0644"
+#    owner: "prometheus"
+#    group: "prometheus"
+
+- name: Copy config to /etc/prometheus
+  copy:
+    src: prometheus.yml
+    dest: /etc/prometheus/prometheus.yml
+    mode: "0644"
+    owner: "prometheus"
+    group: "prometheus"
+
+- name: Create prometheus.service
+  copy:
+    src: prometheus.service
+    dest: /lib/systemd/system/prometheus.service
+    owner: root
+    group: root
+    mode: '0644'
+#  notify: Start prometheus.service
+

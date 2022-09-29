@@ -1,0 +1,80 @@
+---
+# tasks file for alertmanager_install
+- name: Create group alertmanager
+  ansible.builtin.group:
+    name: alertmanager
+    state: present
+
+- name: Create user alertmanager
+  ansible.builtin.user:
+    name: alertmanager
+    state: present
+    group: alertmanager
+    create_home: false
+    shell: "/usr/bin/false"
+
+- name: Create dir
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: alertmanager
+    group: alertmanager
+    mode: "0755"
+  with_items:
+    - "/etc/alertmanager"
+    - "/var/lib/prometheus/alertmanager"
+
+- name: Get latest alertmanager
+  get_url:
+    url: https://github.com/prometheus/alertmanager/releases/download/v0.24.0/alertmanager-0.24.0.linux-amd64.tar.gz
+    dest: /usr/local/src/alertmanager.tar.gz
+
+- name: Extract archive
+  command: "tar zxf /usr/local/src/alertmanager.tar.gz -C /usr/local/src/"
+
+- name: Delete archive
+  file:
+    path: /usr/local/src/alertmanager.tar.gz
+    state: absent
+
+- name: Rename result dir to alertmanager
+  ansible.builtin.shell:
+    cmd: bash -c "mv /usr/local/src/alertmanager-* /usr/local/src/alertmanager"
+  changed_when: false
+
+
+- name: Copy bin-file to /usr/local/bin
+  ansible.builtin.copy:
+    src: "/usr/local/src/alertmanager/{{ item }}"
+    dest: "/usr/local/bin/"
+    remote_src: true
+    owner: alertmanager
+    group: alertmanager
+    mode: "0755"
+  with_items:
+    - "alertmanager"
+    - "amtool"
+
+- name: Copy config to /etc/alertmanager
+  ansible.builtin.copy:
+    src: "/usr/local/src/alertmanager/alertmanager.yml"
+    dest: "/etc/alertmanager/"
+    remote_src: true
+    mode: "0644"
+    owner: "alertmanager"
+    group: "alertmanager"
+
+- name: Copy Conf File Alerts
+  copy:
+    src: "alerts.rules.yml"
+    dest: "/etc/prometheus/"
+  notify: Start prometheus.service
+
+- name: Create alertmanager.service
+  copy:
+    src: alertmanager.service
+    dest: /lib/systemd/system/alertmanager.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Start alertmanager.service

@@ -1,0 +1,28 @@
+---
+# tasks file for apache
+- name: Install Apache Web Server on Debian Family
+  apt:
+    name: ['apache2', 'libapache2-mod-php', 'rsync']
+    state: latest
+  notify:
+    - start apache
+- name: Create dir
+  file:
+    path: /var/www/{{ item.key }}
+    state: directory
+  with_dict: "{{ apache_sites }}"
+- name: Add Virtual Hosts Config
+  template:
+    src: apache_vhosts.conf
+    dest: /etc/apache2/sites-available/{{ item.key }}.conf
+    owner: root
+    group: root
+    mode: 0644
+  with_dict: "{{ apache_sites }}"
+- name: Enable Site Config
+  file:
+    src: /etc/apache2/sites-available/{{ item.key }}.conf
+    dest: /etc/apache2/sites-enabled/{{ item.key }}.conf
+    state: link
+  with_dict: "{{ apache_sites }}"
+  notify: reload apache

@@ -1,0 +1,9 @@
+---
+# defaults file for mysql
+mysql_galera_root_user_password: 'root'
+mysql_galera_node_address: 0.0.0.0
+mysql_galera_wsrep_version: 5.7
+mysql_galera_wsrep_cluster_name: nicko
+
+mysql_galera_wsrep_provider: /usr/lib/galera/libgalera_smm.so
+mysql_galera_conf_dir: /etc/mysql

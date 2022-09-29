@@ -1,0 +1,27 @@
+[mysqld]
+binlog_format=ROW
+binlog_row_image=minimal
+default-storage-engine=innodb
+innodb_autoinc_lock_mode=2
+innodb_flush_log_at_trx_commit=0
+#bind-address={{ mysql_galera_node_address }}
+bind-address=0.0.0.0
+
+
+# Galera Provider Configuration
+wsrep_on=ON
+wsrep_provider={{ mysql_galera_wsrep_provider }}
+
+# Galera Cluster Configuration
+wsrep_cluster_name="{{ mysql_galera_wsrep_cluster_name }}"
+wsrep_cluster_address="gcomm://{% for host in groups['dbs'] %}{{ hostvars[host]['mysql_galera_node_address'] }},{% endfor %}"
+
+# Galera Synchronization Configuration
+wsrep_sst_method=rsync
+
+# Galera Node Configuration
+wsrep_node_address="{{ mysql_galera_node_address }}"
+wsrep_node_name="{{ mysql_galera_node_address }}"
+wsrep_provider_options="gcache.size=1G"
+wsrep_causal_reads=ON
+server_id = "{{ mysql_galera_server_id }}"

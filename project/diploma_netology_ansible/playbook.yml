@@ -1,0 +1,111 @@
+---
+- hosts: nginx
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: ubuntu
+  vars:
+    nginx_user: www-data
+  roles:
+   - update
+   - nginx
+   - proxy-firewall
+
+- hosts: all
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: ubuntu
+  roles:
+   - update
+   - hosts_upload
+   - hostname_set
+   - pubkey_distribution
+   - node_exporter_install
+
+- hosts: dbs
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: ubuntu
+  roles:
+   - mysql_galera_cluster_install
+
+- hosts: db01
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: ubuntu
+  roles:
+   - mysqld_bootstrap
+
+- hosts: db02 db03
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: ubuntu
+  roles:
+   - mysqld_start
+
+- hosts: haproxy
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: ubuntu
+  roles:
+   - haproxy_install
+
+- hosts: db01
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: ubuntu
+  roles:
+   - mysql_create_db
+   - mysql_create_user
+   - mysql_exporter_user
+
+- hosts: dbs
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: ubuntu
+  roles:
+   - mysqld_exporter_install
+
+- hosts: app
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: ubuntu
+  roles:
+   - php
+   - apache
+   - wordpress
+
+- hosts: gitlab
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: ubuntu
+  roles:
+   - gitlab_install
+
+- hosts: runner
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: ubuntu
+  roles:
+   - runner_install
+
+- hosts: monitoring
+  become: true
+  become_method: sudo
+  become_user: root
+  remote_user: ubuntu
+  roles:
+   - prometheus_install
+   - alertmanager_install
+   - grafana_install
+

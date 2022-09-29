@@ -1,0 +1,8 @@
+127.0.0.1	localhost
+192.168.10.20	app.sysad.su
+192.168.10.21	gitlab.sysad.su
+192.168.10.22	runner.sysad.su
+192.168.10.30	haproxy.sysad.su proxy-sql.sysad.su
+192.168.10.31	db01.sysad.su
+192.168.10.32	db02.sysad.su
+192.168.10.33	db03.sysad.su

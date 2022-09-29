@@ -1,0 +1,75 @@
+---
+# tasks file for grafana_install
+- ufw:
+    state: disabled
+    policy: allow
+
+- name: Create group grafana
+  ansible.builtin.group:
+    name: "grafana"
+    state: "present"
+
+- name: Create user grafana
+  ansible.builtin.user:
+    name: "grafana"
+    state: "present"
+    group: "grafana"
+    create_home: false
+    shell: "/usr/bin/false"
+
+#- name: Create dir
+#  ansible.builtin.file:
+#    path: "{{ item }}"
+#    state: "directory"
+#    owner: "prometheus"
+#    group: "prometheus"
+#    mode: "0755"
+#  with_items:
+#    - "/etc/prometheus"
+#    - "/var/lib/prometheus"
+
+- name: Upload grafana package
+  copy:
+    src: "grafana-enterprise_9.1.6_amd64.deb"
+    dest: "/usr/local/src/grafana.deb"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: Install packages grafana
+  apt:
+    deb: /usr/local/src/grafana.deb
+
+- name: Dashboard setup config
+  copy:
+    src: provisioning/dashboards/dashboard.yml
+    dest: /etc/grafana/provisioning/dashboards/dashboard.yml
+
+- name: Dashboard setup
+  copy:
+    src: "provisioning/dashboards/{{ item }}"
+    dest: "/etc/grafana/provisioning/dashboards/{{ item }}"
+  with_items:
+    - "general_monitor_services.json"
+    - "mysql_rev1.json"
+    - "node-exporter-for-prometheus-dashboard-en-v20201010_rev1.json"
+
+- name: Datasources setup config
+  copy:
+    src: provisioning/datasources/datasource.yml
+    dest: /etc/grafana/provisioning/datasources/datasource.yml
+
+#- name: Add dashboards dir
+#  file:
+#    path: /var/lib/grafana/dashboards
+#    recurse: yes
+#    state: directory
+
+- name: Reload systemd
+  command: systemctl daemon-reload
+
+- name: Systemctl Grafana Start
+  systemd:
+    name: grafana-server
+    state: started
+    enabled: yes

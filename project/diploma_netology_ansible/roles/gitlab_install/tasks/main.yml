@@ -1,0 +1,39 @@
+---
+# tasks file for gitlab_install
+- name: Install GitLab dependencies
+  apt:
+#    name: ['curl', 'ca-certificates', 'postfix','tzdata','openssl', 'gnupg2']
+    name: ['curl', 'ca-certificates', 'tzdata','openssl', 'gnupg2', 'git']
+    state: present
+- name: Add repository
+#  command: "curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | sudo bash"
+#  command: "curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | bash"
+  get_url:
+    url: https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh
+    dest: /home/ubuntu/script.deb.sh
+
+- name: Install repository
+  command: "bash /home/ubuntu/script.deb.sh"
+
+- name: Install gitlab
+  apt:
+    name: gitlab-ce
+    state: present
+
+- name: Copy config to gitlab node
+  copy:
+    src: gitlab.rb
+    dest: /etc/gitlab/gitlab.rb
+    owner: root
+    group: root
+    mode: '0644'
+- name: Copy id_rsa to gitlab node
+  copy:
+    src: id_rsa
+    dest: /home/ubuntu/.ssh/id_rsa
+    owner: ubuntu
+    group: ubuntu
+    mode: '0600'
+
+- name: Gitlab reconfigure
+  command: "gitlab-ctl reconfigure"

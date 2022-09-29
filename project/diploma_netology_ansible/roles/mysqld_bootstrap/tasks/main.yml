@@ -1,0 +1,11 @@
+---
+# tasks file for mysqld_bootstrap
+- name: Copy  file to node
+  copy:
+    src: start_bootstrap.sh
+    dest: /usr/bin/
+    mode: 0744
+    owner: root
+    group: root
+- name: Start bootstrap
+  command: /usr/bin/start_bootstrap.sh

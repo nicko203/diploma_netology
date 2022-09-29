@@ -1,0 +1,7 @@
+---
+# handlers file for mysqld_exporter_install
+- name: "Start mysql_exporter.service"
+  systemd:
+    name: "mysql_exporter.service"
+    state: "started"
+    enabled: "true"

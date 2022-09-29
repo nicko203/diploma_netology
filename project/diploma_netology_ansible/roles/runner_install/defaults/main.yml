@@ -1,0 +1,5 @@
+---
+# defaults file for runner_install
+
+GitLabURL: "http://gitlab.sysad.su"
+GitLabToken: "2tikets2Istambul"

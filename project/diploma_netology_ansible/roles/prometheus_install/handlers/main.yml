@@ -1,0 +1,7 @@
+---
+# handlers file for prometheus_install
+- name: "Start prometheus.service"
+  systemd:
+    name: "prometheus.service"
+    state: "started"
+    enabled: "true"

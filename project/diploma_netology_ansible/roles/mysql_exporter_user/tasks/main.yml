@@ -1,0 +1,9 @@
+---
+# tasks file for mysql_create_user
+- name: Create database user with name 'mysqld_exporter' and password '...' 
+  community.mysql.mysql_user:
+    name: mysqld_exporter
+    password: mysqld_exporter
+    priv: '*.*:PROCESS, REPLICATION CLIENT, SELECT'
+    host: "localhost"
+    state: present

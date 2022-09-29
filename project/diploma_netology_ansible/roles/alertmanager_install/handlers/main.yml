@@ -1,0 +1,13 @@
+---
+# handlers file for alertmanager_install
+- name: "Start alertmanager.service"
+  systemd:
+    name: "alertmanager.service"
+    state: "started"
+    enabled: "true"
+
+- name: "Start prometheus.service"
+  systemd:
+    name: "prometheus.service"
+    state: "started"
+    enabled: "true"

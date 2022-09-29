@@ -1,0 +1,9 @@
+---
+# tasks file for mysql_create_user
+- name: Create database user with name 'wordpress' and password '...' 
+  community.mysql.mysql_user:
+    name: wordpress
+    password: wordpress
+    priv: 'wordpress.*:ALL'
+    host: "%"
+    state: present

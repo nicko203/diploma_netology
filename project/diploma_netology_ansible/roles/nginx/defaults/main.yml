@@ -1,0 +1,43 @@
+---
+# defaults file for nginx
+nginx_sites:
+  w3.sysad.su:
+    domains:
+      - w3.sysad.su
+    upstreams:
+      - { backend_address: "192.168.10.20", backend_port: 80 }   #app_to_www
+    ssl: true
+    letsencrypt: true
+    letsencrypt_email: "info@sysad.su"
+  gitlab.sysad.su:
+    domains:
+      - gitlab.sysad.su
+    upstreams:
+      - { backend_address: "192.168.10.21", backend_port: 80 }   #gitlab_to_gitlab
+    ssl: true
+    letsencrypt: true
+    letsencrypt_email: "info@sysad.su"
+  prometheus.sysad.su:
+    domains:
+      - prometheus.sysad.su
+    upstreams:
+      - { backend_address: "192.168.10.25", backend_port: 9090 }  #monitoring_prometheus
+    ssl: true
+    letsencrypt: true
+    letsencrypt_email: "info@sysad.su"
+  grafana.sysad.su:
+    domains:
+      - grafana.sysad.su
+    upstreams:
+      - { backend_address: "192.168.10.25", backend_port: 3000 }  #monitoring_grafana
+    ssl: true
+    letsencrypt: true
+    letsencrypt_email: "info@sysad.su"
+  alertmanager.sysad.su:
+    domains:
+      - alertmanager.sysad.su
+    upstreams:
+      - { backend_address: "192.168.10.25", backend_port: 9093 }  #monitoring_alertmanager
+    ssl: true
+    letsencrypt: true
+    letsencrypt_email: "info@sysad.su"

@@ -1,0 +1,42 @@
+---
+# tasks file for node_exporter_install
+- name: Get latest mysqld_exporter
+  get_url:
+    url: https://github.com/prometheus/mysqld_exporter/releases/download/v0.14.0/mysqld_exporter-0.14.0.linux-amd64.tar.gz
+    dest: /usr/local/src/mysqld_exporter.tar.gz
+
+- name: Extract archive
+  command: "tar zxf /usr/local/src/mysqld_exporter.tar.gz -C /usr/local/src/"
+
+- name: Rename result dir to mysqld_exporter
+  ansible.builtin.shell:
+    cmd: bash -c "mv /usr/local/src/mysqld_exporter-* /usr/local/src/mysqld_exporter"
+  changed_when: false
+
+- name: Copy bin-file to /usr/local/bin
+  ansible.builtin.copy:
+    src: "/usr/local/src/mysqld_exporter/{{ item }}"
+    dest: "/usr/local/bin/"
+    remote_src: true
+    owner: "nodeusr"
+    group: "nodeusr"
+    mode: "0755"
+  with_items:
+    - "mysqld_exporter"
+
+- name: Create mysqld_exporter.service
+  copy:
+    src: .mysqld_exporter.cnf
+    dest: /etc/.mysqld_exporter.cnf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create mysql_exporter.service
+  copy:
+    src: mysql_exporter.service
+    dest: /lib/systemd/system/mysql_exporter.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Start mysql_exporter.service

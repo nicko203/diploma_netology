@@ -1,0 +1,7 @@
+---
+# defaults file for apache
+apache_sites:
+  w3.sysad.su:
+    domains:
+      - w3.sysad.su
+    admin_email: "info@sysad.su"

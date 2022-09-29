@@ -1,0 +1,101 @@
+---
+# tasks file for mysql
+# Idia by https://github.com/DevoInc/ansible-mysql-galera  and https://www.digitalocean.com/community/tutorials/how-to-configure-a-galera-cluster-with-mysql-on-ubuntu-18-04-servers-ru
+#- name: Create apparmor file
+#  file:
+#    path: /etc/apparmor.d/local/usr.sbin.mysqld
+#    state: touch
+
+#- name: Disable apparmor for MySQL
+#  command: aa-complain /usr/sbin/mysqld
+
+- ufw:
+    state: disabled
+    policy: allow
+
+- name: Add apt key for Galera server
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: 44B7345738EBDE52594DAD80D669017EBC19DDBA
+    state: present
+
+- name: Add repo for Galera
+  apt_repository:
+    repo: '{{ item }}'
+    state: present
+    filename: galera-repo
+    update_cache: yes
+  with_items:
+    - "deb http://releases.galeracluster.com/mysql-wsrep-{{ mysql_galera_wsrep_version }}/ubuntu/ bionic main"
+    - deb http://releases.galeracluster.com/galera-3/ubuntu bionic main
+
+- name: Add Galera repo preference
+  template:
+    src: galera.pref.j2
+    dest: /etc/apt/preferences.d/galera.pref
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Specify MySQL root password before installing
+  debconf:
+    name: "mysql-wsrep-server-{{ mysql_galera_wsrep_version }}"
+    question: mysql-server/root_password
+    value: '{{ mysql_galera_root_user_password | quote }}'
+    vtype: password
+  become: true
+
+- name: Confirm MySQL root password before installing
+  debconf:
+    name: "mysql-wsrep-server-{{ mysql_galera_wsrep_version }}"
+    question: mysql-server/root_password_again
+    value: '{{ mysql_galera_root_user_password | quote }}'
+    vtype: password
+  become: true
+
+- name: Install packages Galera
+  apt:
+    name: ['software-properties-common', 'galera-3', 'galera-arbitrator-3', 'mysql-wsrep-{{ mysql_galera_wsrep_version }}', 'rsync', 'debconf-utils', 'apparmor-utils']
+    state: present
+
+- name: Create config dir
+  file:
+    path: "{{ mysql_galera_conf_dir }}/conf.d/"
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+
+- name: Modify file for Galera
+  template:
+    src: galera.cnf.j2
+    dest: "{{ mysql_galera_conf_dir }}/conf.d/galera.cnf"
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Stop mysql
+  service:
+    name: mysql
+    state: stopped
+
+#- name: Copy mysql file to systemd tmpfiles.d
+#  copy:
+#    src: mysql.conf
+#    dest: /etc/tmpfiles.d
+#    mode: 0644
+#    owner: root
+#    group: root
+
+- name: Copy My.cnf file and change settings
+  template:
+    src: my.cnf.j2
+    dest: "{{ mysql_galera_conf_dir }}/my.cnf"
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Enable mysql service
+  systemd:
+    name: mysql.service
+    enabled: true

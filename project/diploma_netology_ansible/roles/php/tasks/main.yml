@@ -1,0 +1,6 @@
+---
+# tasks file for php
+- name: Install PHP
+  apt:
+    name: ['php', 'php-gd', 'php-curl','php-imagick','php-mysqli','php-opcache','php-soap','php-zip']
+    state: present

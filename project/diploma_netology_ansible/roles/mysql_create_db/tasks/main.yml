@@ -1,0 +1,6 @@
+---
+# tasks file for mysql_create_db
+- name: Create a new database 'wordpress'
+  community.mysql.mysql_db:
+    name: wordpress
+    state: present

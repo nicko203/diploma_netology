@@ -1,0 +1,6 @@
+---
+# tasks file for mysqld_start
+- name: Start mysql service
+  systemd:
+    name: mysql
+    state: started

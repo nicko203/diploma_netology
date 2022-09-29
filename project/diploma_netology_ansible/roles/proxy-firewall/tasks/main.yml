@@ -1,0 +1,90 @@
+---
+# tasks file for proxy-firewall
+- name: Replace before.rules
+  template:
+    src=templates/before.rules
+    dest=/etc/ufw/before.rules
+
+- name: Replace default
+  template:
+    src=templates/ufw
+    dest=/etc/default/ufw
+
+- name: UFW - Allow SSH connections
+  ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+
+- name: Allow all access to tcp port 80
+  ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+
+- name: Allow all access to tcp port 443
+  ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+
+- name: Allow all access to tcp port 2220
+  ufw:
+    rule: allow
+    port: "2220"
+    proto: tcp
+
+- name: Allow all access to tcp port 2221
+  ufw:
+    rule: allow
+    port: "2221"
+    proto: tcp
+
+
+- name: Allow all access to tcp port 2222
+  ufw:
+    rule: allow
+    port: "2222"
+    proto: tcp
+
+- name: Allow all access to tcp port 2230
+  ufw:
+    rule: allow
+    port: "2230"
+    proto: tcp
+
+- name: Allow all access to tcp port 2231
+  ufw:
+    rule: allow
+    port: "2231"
+    proto: tcp
+
+- name: Allow all access to tcp port 2232
+  ufw:
+    rule: allow
+    port: "2232"
+    proto: tcp
+
+- name: Allow all access to tcp port 2233
+  ufw:
+    rule: allow
+    port: "2233"
+    proto: tcp
+
+- name: Allow all access to tcp port 2240
+  ufw:
+    rule: allow
+    port: "2240"
+    proto: tcp
+
+- name: Allow all access to tcp port 9100
+  ufw:
+    rule: allow
+    port: "9100"
+    proto: tcp
+
+- name: UFW - Enable and deny by default
+  command: ufw --force enable
+#  community.general.ufw:
+#    state: enabled
+#    default: deny

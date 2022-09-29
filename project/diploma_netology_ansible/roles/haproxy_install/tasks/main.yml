@@ -1,0 +1,38 @@
+---
+# tasks file for haproxy_install
+- name: Disable ufw
+  ufw:
+    state: disabled
+    policy: allow
+
+- name: Install HAProxy
+  apt:
+    name: haproxy
+
+- name: Install MySQL client
+  apt:
+    name: mysql-client-core-5.7
+
+- name: Stop HAProxy
+  systemd:
+    name: haproxy
+    state: stopped
+
+- name: Enable HAProxy
+  systemd:
+    name: haproxy
+    enabled: true
+
+- name: Copy HAProxy config to node
+  copy:
+   src: haproxy.cfg
+   dest: /etc/haproxy/haproxy.cfg
+   owner: root
+   group: root
+   mode: '0644'
+
+- name: Start HAProxy
+  systemd:
+    name: haproxy
+    state: started
+

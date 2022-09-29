@@ -1,0 +1,9 @@
+---
+# tasks file for hosts_upload
+- name: Copy hosts to node
+  copy:
+    src: hosts
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: '0644'

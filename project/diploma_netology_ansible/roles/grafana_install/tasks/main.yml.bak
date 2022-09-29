@@ -1,0 +1,41 @@
+---
+# tasks file for grafana_install
+- name: Add graphana key repository
+  command: "wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -"
+
+- name: Add graphana key repository
+  apt_repository:
+    repo: 'deb https://packages.grafana.com/oss/deb stable main'
+    state: present
+    filename: galera-repo
+    update_cache: yes
+
+- name: Install packages Galera
+  apt:
+    name: 'grafana'
+    state: present
+
+- name: Dashboard setup config
+  copy:
+    src: provisioning/dashboards/dashboard.yml
+    dest: /etc/grafana/provisioning/dashboards/dashboard.yml
+
+- name: Datasources setup config
+  copy:
+    src: provisioning/datasources/datasource.yml
+    dest: /etc/grafana/provisioning/datasources/datasource.yml
+
+- name: Add dashboards dir
+  file:
+    path: /var/lib/grafana/dashboards
+    recurse: yes
+    state: directory
+
+- name: Reload systemd
+  command: systemctl daemon-reload
+
+- name: Systemctl Grafana Start
+  systemd:
+    name: grafana-server
+    state: started
+    enabled: yes

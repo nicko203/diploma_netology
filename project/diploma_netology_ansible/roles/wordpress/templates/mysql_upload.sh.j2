@@ -1,0 +1,2 @@
+#!/bin/bash
+mysql -u {{item.value.mysql_user}} -p{{item.value.mysql_passwd}} -h {{item.value.mysql_host}} {{item.value.mysql_db}} < {{item.value.site_path}}{{item.key}}/{{item.value.dump}}
