@@ -200,4 +200,4 @@ phpinfo();
 
 **Grafana** дашбоард, отображающий метрики из MySQL:  
 
-![grafana_mysql_exporter.png](images/grafana_mysql_exporter.png.png)
+![grafana_mysql_exporter.png](images/grafana_mysql_exporter.png)
