@@ -11,8 +11,8 @@ terraform {
     bucket     = "tf-state-bucket-nicko-diploma"
     region     = "ru-central1-a"
     key        = "terraform/infrastructure1/terraform.tfstate"
-    access_key = "YCAJE0uAC5NT4xw6fizqxktoa"
-    secret_key = "YCOb2Gu-v1wLwdi1yLWNubuIenuuKrbVZ3c3UI_2"
+    access_key = "YCAxxxxxxxxxxxxxxxxxxxxxx"
+    secret_key = "YCOxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
     skip_region_validation      = true
     skip_credentials_validation = true
