@@ -220,3 +220,6 @@ phpinfo();
 ![grafana_mysql_exporter.png](images/grafana_mysql_exporter.png)
 
 ---
+
+Рабочие файла проекта находятся в каталоге https://github.com/nicko203/diploma_netology/tree/main/project
+---
